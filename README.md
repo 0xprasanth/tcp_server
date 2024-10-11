@@ -13,7 +13,7 @@ This project demonstrates a simple custom **TCP server** built in Go, using only
   - [Stopping the Server ⏹️](#stopping-the-server-️)
 - [Code Overview :man\_technologist:](#code-overview-man_technologist)
 - [Example Output :scroll:](#example-output-scroll)
-- [License:page\_facing\_up:](#licensepage_facing_up)
+- [License :page\_facing\_up:](#license-page_facing_up)
 
 
 ## Features :sparkles:
@@ -101,6 +101,6 @@ When a client connects and sends a message, the server logs the message:
 Received message: Hello, server!
 ```
 
-## License:page_facing_up:
+## License :page_facing_up:
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
