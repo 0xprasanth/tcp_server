@@ -19,6 +19,7 @@ type Server struct {
 	ln            net.Listener
 	quitch        chan struct{}
 	msgch         chan Message // new channel only for msg purpose
+	// create peerMap of map[net.Addr] to maintain, identify and track message from connections^_
 }
 
 func NewServer(listenAddr string) *Server {
@@ -101,6 +102,8 @@ func (s *Server) readLoop(conn net.Conn) {
 			payload: buf[:endBuffer],
 			from:    conn.RemoteAddr().String(),
 		}
+		// write back to the connection
+		conn.Write([]byte("We got your message, Thank you."))
 	}
 }
 
