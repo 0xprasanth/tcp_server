@@ -9,16 +9,24 @@ import (
 	"syscall"
 )
 
+type Message struct {
+	from    string
+	payload []byte
+}
+
 type Server struct {
 	listenAddress string
 	ln            net.Listener
 	quitch        chan struct{}
+	msgch         chan Message // new channel only for msg purpose
 }
 
 func NewServer(listenAddr string) *Server {
 	return &Server{
 		listenAddress: listenAddr,
 		quitch:        make(chan struct{}),
+		// byte is always better than any data type or literal
+		msgch: make(chan Message),
 	}
 
 }
@@ -51,6 +59,8 @@ func (s *Server) Start() error {
 
 	// wait for the quitch channel
 	// <-s.quitch
+	//clean up
+	close(s.msgch) // whenever we stop the server, people can still read from this channel
 
 	return nil
 }
@@ -85,14 +95,25 @@ func (s *Server) readLoop(conn net.Conn) {
 			fmt.Println("read error: ", err)
 			continue
 		}
-		msg := buf[:endBuffer]
-		fmt.Println(string(msg))
+		// instead of print the buffer
+		// write buffer into the channel, so that everyone can even if the buffer is full
+		s.msgch <- Message{
+			payload: buf[:endBuffer],
+			from:    conn.RemoteAddr().String(),
+		}
 	}
 }
 
 func main() {
 	server := NewServer(":3000")
-	// server.Start()
+
+	// go routing for readLoop
+	go func() {
+		for msg := range server.msgch {
+			fmt.Printf("message recieved from (%s): %s\n", msg.from, string(msg.payload))
+		}
+	}()
+
 	// use log fatal for error logs
 	log.Fatal(server.Start())
 }
